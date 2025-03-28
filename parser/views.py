@@ -1,7 +1,8 @@
 from django.shortcuts import render
 
 from parser.forms import IndexForm
-from .core.maps import Parse
+from .tasks import run_parser
+
 
 def index(request):
     if request.POST:
@@ -10,7 +11,11 @@ def index(request):
             qd = form.cleaned_data
             print(request.user)
             print(request.POST)
-            Parse(qd['сity_name'], qd['category']).run()
+            сity_name = qd['сity_name']
+            category = qd['category']
+            #запускаем задачу в Celery
+            run_parser.delay(category, сity_name)
+
             print('CLEAN DATA', qd['category'], type(qd['сity_name']))
 
             return render(request, "parser/order.html", {"form": form})
