@@ -5,15 +5,19 @@ import random
 import undetected_chromedriver as uc
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-import asinc_mail_parse
-import json_to_excel
+
+# from parser.core import ParseSite, run
+
+# import json_to_excel
 
 
 class Parse:
-    def __init__(self, url: str, version_main: int):
+    def __init__(self, location: str, organisation: str):
         self.item = None
-        self.url = url
-        self.version_main = version_main
+        self.organisation = organisation
+        self.url = f'https://yandex.ru/maps/193/voronezh/search/{self.organisation} {location}'
+
+        self.version_main = 134
         self.data = []
         self.elements = []
         self.link_list_items = []
@@ -109,7 +113,7 @@ class Parse:
                 print('Какая то ошибка')
         self.__save_data(self.data, 'scv_json/test_site.json')
 
-    def __save_data(self, data: list, name_file:str):
+    def __save_data(self, data: list, name_file: str):
         with open(name_file, 'w', encoding='utf-8') as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
 
@@ -117,13 +121,7 @@ class Parse:
         self.__set_up()
         self.__get_url()
         self.parse_page()
+        run(self.data)
+        json_to_excel.main(self.organisation)
 
 
-if __name__ == '__main__':
-    location = 'Воронеж'
-    organisation = 'Школа'
-    Parse(
-        url=f'https://yandex.ru/maps/193/voronezh/search/{organisation} {location}',
-        version_main=134).run()
-    asinc_mail_parse.run()
-    json_to_excel.main(organisation)
