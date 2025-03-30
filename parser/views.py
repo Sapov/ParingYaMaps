@@ -1,9 +1,11 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 from parser.forms import IndexForm
 from .tasks import run_parser
 
 
+@login_required
 def index(request):
     if request.POST:
         form = IndexForm(request.POST)
@@ -13,7 +15,7 @@ def index(request):
             print(request.POST)
             сity_name = qd['сity_name']
             category = qd['category']
-            #запускаем задачу в Celery
+            # запускаем задачу в Celery
             run_parser.delay(category, сity_name)
 
             print('CLEAN DATA', qd['category'], type(qd['сity_name']))

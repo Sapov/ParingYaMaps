@@ -1,6 +1,6 @@
 from celery import shared_task
 
-from parser.core import Parse
+from .core.maps import Parse
 
 
 @shared_task

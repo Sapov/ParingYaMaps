@@ -19,6 +19,7 @@ click-repl==0.3.0
 cryptography==44.0.2
 Django==5.1.7
 django-allauth==65.6.0
+django-extensions==3.2.3
 et_xmlfile==2.0.0
 exceptiongroup==1.2.2
 frozenlist==1.5.0
@@ -35,6 +36,7 @@ pycparser==2.22
 PyJWT==2.10.1
 PySocks==1.7.1
 python-dateutil==2.9.0.post0
+redis==5.2.1
 requests==2.32.3
 requests-oauthlib==2.0.0
 selenium==4.30.0

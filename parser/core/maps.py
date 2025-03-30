@@ -6,8 +6,9 @@ import undetected_chromedriver as uc
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
-# from parser.core import ParseSite, run
+from parser.models import Links, Category, City
 
+# from async_parse_site import run as parser_site
 # import json_to_excel
 
 
@@ -15,6 +16,7 @@ class Parse:
     def __init__(self, location: str, organisation: str):
         self.item = None
         self.organisation = organisation
+        self.location = location
         self.url = f'https://yandex.ru/maps/193/voronezh/search/{self.organisation} {location}'
 
         self.version_main = 134
@@ -36,8 +38,8 @@ class Parse:
     def parse_page(self):
         """Получаем блоки элементов"""
         preview_count = elements_new = count = 0
-        while True:
-            # while count < 6:
+        # while True:
+        while count < 6:
             elements_new = self.driver.find_elements(By.CSS_SELECTOR, ".search-snippet-view")
             '''Прокрутка вниз'''
             self.driver.execute_script("arguments[0].scrollIntoView(true);", elements_new[-1])
@@ -82,9 +84,12 @@ class Parse:
                     'rating_yandex': rating_yandex,
                     'estimation': estimation
                     }
+            category = Category.objects.create(name_category = self.organisation)
+            city = City.objects.create(name_city = self.location)
+            Links.objects.update_or_create(category = category, сity_name=city, link=link, title=title, rate=rating_yandex, estimation=estimation)
             self.link_list_items.append(item)
         print('В СЛОВАРЕ: ', len(self.link_list_items))
-        self.__save_data(self.link_list_items, 'scv_json/links.json')
+        self.__save_data(self.link_list_items, 'links.json')
         for i in self.link_list_items:
             print('list item:', i)
 
@@ -107,11 +112,27 @@ class Parse:
                                      self.driver.find_element(By.CSS_SELECTOR, '.business-urls-view__text').text)
                 except:
                     items['site'] = ''
+                category, created = Category.objects.get_or_create(name_category=self.organisation)
+                if created:
+                    print('Категория создана')
+                else:
+                    print('Категория уже существует')
+
+                city = City.objects.create(name_city=self.location)
+                Links.objects.update_or_create(category=category,
+                                               сity_name=city,
+                                               link=items['link'],
+                                               title=items['title'],
+                                               rate=items['rating_yandex'],
+                                               phone=items['phone'],
+                                               address=items['address'],
+                                               site=items['site'],
+                                               )
                 self.data.append(items)
                 print(items, '\n', '*' * 10)
             except:
                 print('Какая то ошибка')
-        self.__save_data(self.data, 'scv_json/test_site.json')
+        self.__save_data(self.data, 'test_site.json')
 
     def __save_data(self, data: list, name_file: str):
         with open(name_file, 'w', encoding='utf-8') as file:
@@ -121,7 +142,5 @@ class Parse:
         self.__set_up()
         self.__get_url()
         self.parse_page()
-        run(self.data)
-        json_to_excel.main(self.organisation)
-
-
+        # parser_site(self.data)
+        # json_to_excel.main(self.organisation)

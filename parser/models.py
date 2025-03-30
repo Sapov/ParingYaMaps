@@ -8,10 +8,10 @@ Users = get_user_model()
 
 
 class Category(models.Model):
-    name_category = models.CharField(max_length=255, verbose_name='Категория')
+    name_category = models.CharField(max_length=255, verbose_name='Категория', unique=True)
 
 class City(models.Model):
-    name_city = models.CharField(max_length=255, verbose_name='Город')
+    name_city = models.CharField(max_length=255, verbose_name='Город', unique=True)
 
 class Links(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория')

@@ -7,6 +7,13 @@ import asyncio
 from bs4 import BeautifulSoup as bs
 
 
+def run(lst:list):
+    start = time.time()
+
+    asyncio.run(ParseSite(lst).main())
+    print('Время выполнения: ', time.time() - start)
+
+
 class ParseSite:
     def __init__(self, list_link_site:list):
 
@@ -77,9 +84,3 @@ class ParseSite:
         lst = await asyncio.gather(*requests)
         print(lst)
         return lst
-
-
-def run(lst):
-    start = time.time()
-    asyncio.run(ParseSite(lst).main())
-    print('Время выполнения: ', time.time() - start)

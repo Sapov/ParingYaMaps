@@ -1,15 +1,36 @@
 {% extends 'parser/base.html'%}
 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма в стиле Apple</title>
 
-<title>{% block title %} Новый заказ{% endblock %}</title>
+</head>
 {% block body %}
-<p></p>
-<h3>Добавить новый заказ</h3>
-<form action="{% url 'index' %}" tion method="post" , enctype="multipart/form-data">
+<form action="{% url 'index' %}" method="POST">
 
     {% csrf_token %}
-    {{form.as_p}}
-    <button type="submit" class="btn btn-primary">Новый заказ</button>
-</form>
 
+    <div class="container">
+        <h1>Введите данные</h1>
+
+        <div class="input-group">
+            <label for="field1">Введите город</label>
+            <input type="text" name='сity_name' id="id_сity_name" placeholder="Москва">
+        </div>
+
+        <div class="input-group">
+            <label for="field2">Введите категорию</label>
+            <input type="text" name="category" id="id_category" placeholder="Спа процедуры">
+        </div>
+
+        <div class="button-container">
+            <button type="submit">Собрать данные</button>
+        </div>
+    </div>
+    </form>
 {% endblock %}
+
+</html>

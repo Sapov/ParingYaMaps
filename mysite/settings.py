@@ -41,10 +41,10 @@ INSTALLED_APPS = [
     'users',
     'allauth',
     'allauth.account',
-
     # Optional -- requires install using `django-allauth[socialaccount]`.
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'django_extensions',
 
 ]
 
