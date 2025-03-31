@@ -6,18 +6,20 @@ import undetected_chromedriver as uc
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
-from parser.models import Links, Category, City
+from parser.models import Links, Category, City, Order
 
-# from async_parse_site import run as parser_site
+from .acync_mail_parse import run_parse
+
+
 # import json_to_excel
 
-
 class Parse:
-    def __init__(self, location: str, organisation: str):
+    def __init__(self, category: str, location: str, order_id):
+        self.order_id = order_id
         self.item = None
-        self.organisation = organisation
+        self.category = category
         self.location = location
-        self.url = f'https://yandex.ru/maps/193/voronezh/search/{self.organisation} {location}'
+        self.url = f'https://yandex.ru/maps/193/voronezh/search/{self.category} {self.location}'
 
         self.version_main = 134
         self.data = []
@@ -82,18 +84,45 @@ class Parse:
             item = {'link': link,
                     'title': title,
                     'rating_yandex': rating_yandex,
-                    'estimation': estimation
+                    'estimation': estimation,
                     }
-            category = Category.objects.create(name_category = self.organisation)
-            city = City.objects.create(name_city = self.location)
-            Links.objects.update_or_create(category = category, сity_name=city, link=link, title=title, rate=rating_yandex, estimation=estimation)
+            category, created = Category.objects.get_or_create(name_category=self.category)
+            if created:
+                print('Категория создана')
+            else:
+                print('[LIST LINK] Категория уже существует')
+
+            city, created1 = City.objects.get_or_create(name_city=self.location)
+            if created1:
+                print('Город создан')
+            else:
+                print('Городишко уже существует')
+
+            # Links.objects.update_or_create(link = item['link'],
+            #                                defaults={
+            #                                    'title': item['title'],
+            #                                    'rate': item['rating_yandex'],
+            #                                    'estimation': item['estimation'],
+                                               # 'name': item['name'],
+                                               # 'phone': item['phone'],
+                                               # 'address': item['address'],
+                                               # 'site': item['site'],
+                                               # 'mail': item['mail'],
+                                               # 'whatsapp': item['whatsapp'],
+                                               # 'telegram': item['telegram'],
+                                           #     'category_id': category,
+                                           #     'сity_name_id': city,
+                                           #     'order_id': self.order_id
+                                           # }
+                                           # )
+                # category = category, сity_name=city, link=link, title=title, rate=rating_yandex, estimation=estimation)
             self.link_list_items.append(item)
         print('В СЛОВАРЕ: ', len(self.link_list_items))
         self.__save_data(self.link_list_items, 'links.json')
         for i in self.link_list_items:
             print('list item:', i)
 
-        self.__open_page()
+        # self.__open_page()
 
     def __open_page(self):
         '''Получаем со страницы телефон, адрес, сайт'''
@@ -112,14 +141,19 @@ class Parse:
                                      self.driver.find_element(By.CSS_SELECTOR, '.business-urls-view__text').text)
                 except:
                     items['site'] = ''
-                category, created = Category.objects.get_or_create(name_category=self.organisation)
+                category, created = Category.objects.get_or_create(name_category=self.category)
                 if created:
                     print('Категория создана')
                 else:
-                    print('Категория уже существует')
+                    print('[open page] Категория уже существует')
 
-                city = City.objects.create(name_city=self.location)
-                Links.objects.update_or_create(category=category,
+                city, created1 = City.objects.get_or_create(name_city=self.location)
+                if created1:
+                    print('Город создана')
+                else:
+                    print('[open page] Город уже существует')
+
+                Links.objects.create(category=category,
                                                сity_name=city,
                                                link=items['link'],
                                                title=items['title'],
@@ -127,6 +161,7 @@ class Parse:
                                                phone=items['phone'],
                                                address=items['address'],
                                                site=items['site'],
+                                               order=Order.objects.get(pk=self.order_id)
                                                )
                 self.data.append(items)
                 print(items, '\n', '*' * 10)
@@ -142,5 +177,6 @@ class Parse:
         self.__set_up()
         self.__get_url()
         self.parse_page()
-        # parser_site(self.data)
-        # json_to_excel.main(self.organisation)
+        run_parse()
+
+        # json_to_excel.main(self.category)

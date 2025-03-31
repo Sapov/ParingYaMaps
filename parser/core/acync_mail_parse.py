@@ -7,6 +7,8 @@ import asyncio
 from aiohttp import ClientSession
 from bs4 import BeautifulSoup as bs
 
+from parser.models import Links
+
 
 async def get_page(item: dict) -> dict:
     async with aiohttp.ClientSession() as session:
@@ -71,14 +73,14 @@ def search_telega(page):
 
 
 def open_file():
-    with open('scv_json/test_site.json', 'r', encoding='utf-8') as file:
+    with open('test_site.json', 'r', encoding='utf-8') as file:
         json_items = json.load(file)
         print(json_items)
         return json_items
 
 
 def save_data(new_list):
-    with open(f'scv_json/temp_mail.json', 'w', encoding='utf-8') as file:
+    with open(f'temp_mail.json', 'w', encoding='utf-8') as file:
         json.dump(new_list, file, ensure_ascii=False, indent=4)
 
 
@@ -90,10 +92,10 @@ async def main():
     print(lst)
 
 
-def run():
+def run_parse():
     start = time.time()
     asyncio.run(main())
     print('Время выполнения: ', time.time() - start)
 
 if __name__ == '__main__':
-    run()
+    run_parse()
