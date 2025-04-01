@@ -84,3 +84,6 @@ class ParseSite:
         lst = await asyncio.gather(*requests)
         print(lst)
         return lst
+
+    def add_in_base(self):
+        pass
